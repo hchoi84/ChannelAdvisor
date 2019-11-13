@@ -26,8 +26,8 @@ namespace ChannelAdvisor.Controllers
 
     public IActionResult Index()
     {
-      // string accessToken = _devInfo.GetAccessToken();
-      // ViewBag.AT = accessToken;
+      string accessToken = _devInfo.GetAccessToken();
+      ViewBag.AT = accessToken;
       return View();
     }
 
