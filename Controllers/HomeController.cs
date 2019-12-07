@@ -27,8 +27,29 @@ namespace ChannelAdvisor.Controllers
     public IActionResult Index()
     {
       string accessToken = _devInfo.GetAccessToken();
-      ViewBag.AT = accessToken;
-      return View();
+
+      // var request = new HttpRequestMessage
+      // {
+      //   RequestUri = new Uri($"https://api.channeladvisor.com/v1/Products?$filter=Sku eq 'TAE0064_30' or Sku eq 'TAE0064_29' or Sku eq 'TAE0064'&access_token={accessToken}"),
+      //   Method = HttpMethod.Get,
+      // };
+
+      var request = new HttpRequestMessage
+      {
+        RequestUri = new Uri($"https://api.channeladvisor.com/v1/Products(3892728)/Attributes?access_token={accessToken}"),
+        Method = HttpMethod.Get,
+      };
+
+      var client = new HttpClient();
+      var response = client.SendAsync(request).Result;
+      var content = response.Content;
+      var json = content.ReadAsStringAsync().Result;
+      var result = JObject.Parse(json);
+      JArray a = (JArray)result["value"];
+      List<Product> products = a.ToObject<List<Product>>();
+
+      // return View(products);
+      return Json(result);
     }
 
     public IActionResult Privacy()
