@@ -26,7 +26,7 @@ namespace ChannelAdvisor.Models
       product.AttributeId = attributeId;
       product.LabelNames = joinedLabelNames;
       product.QtyFBA = inventory.QtyFBA;
-      product.QtyGolfio = inventory.QtyGolfio;
+      product.QtyWH = inventory.QtyWH;
       _products.Add(product);
 
       return product.Id;

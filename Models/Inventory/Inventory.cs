@@ -6,7 +6,7 @@ namespace ChannelAdvisor.Models
   {
     public int Id { get; set; }
     public int ProductId { get; set; }
-    public int QtyGolfio { get; set; }
+    public int QtyWH { get; set; }
     public int QtyFBA { get; set; }
     public DateTime Created { get; set; }
   }

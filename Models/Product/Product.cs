@@ -35,6 +35,6 @@ namespace ChannelAdvisor.Models
     public string LabelNames { get; set; }
     
     public int QtyFBA { get; set; }
-    public int QtyGolfio { get; set; }
+    public int QtyWH { get; set; }
   }
 }

@@ -16,7 +16,7 @@ namespace ChannelAdvisor.Models
       {
         Id = _inventories.Any() ? _inventories.Max(i => i.Id) + 1 : 1,
         ProductId = Convert.ToInt32(inventory[0]["ProductId"]),
-        QtyGolfio = GetValue(inventory, 0),
+        QtyWH = GetValue(inventory, 0),
         QtyFBA = GetValue(inventory, -4),
         Created = DateTime.Now,
       };
