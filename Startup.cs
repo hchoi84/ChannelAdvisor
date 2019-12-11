@@ -20,7 +20,11 @@ namespace ChannelAdvisor
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddControllersWithViews().AddNewtonsoftJson();
-      services.AddScoped<IDevInfo, DevInfoApi>();
+      services.AddSingleton<IChannelAdvisor, ChannelAdvisorAPI>();
+      services.AddSingleton<IProduct, LocalProductRepo>();
+      services.AddSingleton<IAttribute, LocalAttributeRepo>();
+      services.AddSingleton<ILabel, LocalLabelRepo>();
+      services.AddSingleton<IProductLabel, LocalProductLabelRepo>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
