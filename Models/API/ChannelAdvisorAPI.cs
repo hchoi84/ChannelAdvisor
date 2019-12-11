@@ -16,9 +16,11 @@ namespace ChannelAdvisor.Models
     private readonly IAttribute _attribute;
     private readonly ILabel _label;
     private readonly IProductLabel _productLabel;
+    private readonly IInventory _inventory;
 
-    public ChannelAdvisorAPI(IProduct product, IAttribute attribute, ILabel label, IProductLabel productLabel)
+    public ChannelAdvisorAPI(IProduct product, IAttribute attribute, ILabel label, IProductLabel productLabel, IInventory inventory)
     {
+      _inventory = inventory;
       _productLabel = productLabel;
       _label = label;
       _attribute = attribute;
@@ -77,13 +79,18 @@ namespace ChannelAdvisor.Models
       foreach (var p in productArray)
       {
         var attributeId = await _attribute.AddAsync((JArray)p["Attributes"]);
-        var productId = await _product.AddAsync(p.ToObject<Product>(), attributeId);
+        var inventory = await _inventory.AddInventoryAsync((JArray)p["DCQuantities"]);
 
-        foreach (var label in (JArray)p["Labels"])
+        List<string> labelNames = new List<string>();
+        foreach (var obj in (JArray)p["Labels"])
         {
-          var labelId = await _label.GetLabelIdByNameAsync(label["Name"].ToString());
-          await _productLabel.AddAsync(productId, labelId);
+          var label = await _label.GetLabelByNameAsync(obj["Name"].ToString());
+          await _productLabel.AddAsync(Convert.ToInt32(obj["ProductId"]), label.Id);
+          labelNames.Add(label.Name);
         }
+
+        string joinedLabelNames = String.Join(", ", labelNames);
+        var productId = await _product.AddAsync(p.ToObject<Product>(), attributeId, inventory, joinedLabelNames);
       }
     }
   }

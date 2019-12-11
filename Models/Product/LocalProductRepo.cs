@@ -17,9 +17,12 @@ namespace ChannelAdvisor.Models
       _productLabel = productLabel;
     }
 
-    public async Task<int> AddAsync(Product product, int attributeId)
+    public async Task<int> AddAsync(Product product, int attributeId, Inventory inventory, string joinedLabelNames)
     {
       product.AttributeId = attributeId;
+      product.LabelNames = joinedLabelNames;
+      product.QtyFBA = inventory.QtyFBA;
+      product.QtyGolfio = inventory.QtyGolfio;
       _products.Add(product);
 
       return product.Id;
@@ -31,7 +34,6 @@ namespace ChannelAdvisor.Models
       foreach (var p in products)
       {
         p.Attribute = await _attribute.GetAttributeAsync(p.AttributeId);
-        p.LabelNames = await _productLabel.GetProductLabelNamesAsync(p.Id);
       }
       return _products;
     }

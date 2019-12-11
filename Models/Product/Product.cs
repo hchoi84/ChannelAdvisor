@@ -33,7 +33,6 @@ namespace ChannelAdvisor.Models
 
     public Attribute Attribute { get; set; }
     public string LabelNames { get; set; }
-    // public Object DCQuantities { get; set; }
     
     public int QtyFBA { get; set; }
     public int QtyGolfio { get; set; }

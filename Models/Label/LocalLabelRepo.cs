@@ -25,7 +25,7 @@ namespace ChannelAdvisor.Models
       throw new NotImplementedException();
     }
 
-    public async Task<int> GetLabelIdByNameAsync(string labelName)
+    public async Task<Label> GetLabelByNameAsync(string labelName)
     {
       var label = _labels.FirstOrDefault(l => l.Name == labelName);
       if (label == null)
@@ -37,10 +37,10 @@ namespace ChannelAdvisor.Models
         };
 
         _labels.Add(newLabel);
-        return newLabel.Id;
+        return newLabel;
       }
 
-      return label.Id;
+      return label;
     }
   }
 }

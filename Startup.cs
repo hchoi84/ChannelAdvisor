@@ -25,6 +25,7 @@ namespace ChannelAdvisor
       services.AddSingleton<IAttribute, LocalAttributeRepo>();
       services.AddSingleton<ILabel, LocalLabelRepo>();
       services.AddSingleton<IProductLabel, LocalProductLabelRepo>();
+      services.AddSingleton<IInventory, LocalInventoryRepo>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
