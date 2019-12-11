@@ -24,7 +24,6 @@ namespace ChannelAdvisor
       services.AddSingleton<IProduct, LocalProductRepo>();
       services.AddSingleton<IAttribute, LocalAttributeRepo>();
       services.AddSingleton<ILabel, LocalLabelRepo>();
-      services.AddSingleton<IProductLabel, LocalProductLabelRepo>();
       services.AddSingleton<IInventory, LocalInventoryRepo>();
     }
 

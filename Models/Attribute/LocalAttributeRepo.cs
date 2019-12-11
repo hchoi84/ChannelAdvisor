@@ -25,6 +25,7 @@ namespace ChannelAdvisor.Models
       att.ItemName = GetValue(attributes, "Item Name");
       att.Qty = GetValue(attributes, "qty");
       att.ShippingFee = float.Parse(GetValue(attributes, "Shipping Fee"));
+      att.SpecialOffers = GetValue(attributes, "Special Offers");
       att.Sync = GetValue(attributes, "sync");
       att.Updated = Convert.ToDateTime(GetValue(attributes, "updated"));
       att.Year = Convert.ToInt32(GetValue(attributes, "Year"));

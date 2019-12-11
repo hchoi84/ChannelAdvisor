@@ -16,6 +16,7 @@ namespace ChannelAdvisor.Models
     public string ItemName { get; set; }
     public string Qty { get; set; }
     public float ShippingFee { get; set; }
+    public string SpecialOffers { get; set; }
     public string Sync { get; set; }
     public DateTime Updated { get; set; }
     public int Year { get; set; }

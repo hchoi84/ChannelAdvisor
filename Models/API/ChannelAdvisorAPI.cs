@@ -11,41 +11,37 @@ namespace ChannelAdvisor.Models
 {
   public class ChannelAdvisorAPI : IChannelAdvisor
   {
-    private DevInfo _devInfo;
     private readonly IProduct _product;
     private readonly IAttribute _attribute;
     private readonly ILabel _label;
-    private readonly IProductLabel _productLabel;
     private readonly IInventory _inventory;
 
-    public ChannelAdvisorAPI(IProduct product, IAttribute attribute, ILabel label, IProductLabel productLabel, IInventory inventory)
+    public ChannelAdvisorAPI(IProduct product, IAttribute attribute, ILabel label, IInventory inventory)
     {
       _inventory = inventory;
-      _productLabel = productLabel;
       _label = label;
       _attribute = attribute;
       _product = product;
-      _devInfo = new DevInfo();
     }
 
     public string GetAccessToken()
     {
-      if (_devInfo.Expire < DateTime.Now || _devInfo.Expire == null)
+      if (DevInfo.Expire < DateTime.Now || DevInfo.Expire == null)
       {
-        string auth = string.Concat(_devInfo.ApplicationId, ":", _devInfo.SharedSecret);
+        string auth = string.Concat(DevInfo.ApplicationId, ":", DevInfo.SharedSecret);
         byte[] authBytes = Encoding.ASCII.GetBytes(auth);
         var encodedAuth = Convert.ToBase64String(authBytes);
         string authorization = string.Concat("Basic ", encodedAuth);
 
         var request = new HttpRequestMessage
         {
-          RequestUri = new Uri(_devInfo.TokenUrl),
+          RequestUri = new Uri(DevInfo.TokenUrl),
           Method = HttpMethod.Post,
           Headers = {
             { HttpRequestHeader.Authorization.ToString(), authorization },
             { HttpRequestHeader.ContentType.ToString(), "application/x-www-form-urlencoded" },
           },
-          Content = new StringContent($"grant_type=refresh_token&refresh_token={_devInfo.RefreshToken}", Encoding.UTF8, "application/json"),
+          Content = new StringContent($"grant_type=refresh_token&refresh_token={DevInfo.RefreshToken}", Encoding.UTF8, "application/json"),
         };
 
         var client = new HttpClient();
@@ -53,19 +49,19 @@ namespace ChannelAdvisor.Models
         var content = response.Content;
         var json = content.ReadAsStringAsync().Result;
         var result = JObject.Parse(json);
-        _devInfo.AccessToken = result["access_token"].ToString();
-        _devInfo.Expire = DateTime.Now.AddSeconds(Convert.ToDouble(result["expires_in"]) - _devInfo.TokenExpireBuffer);
+        DevInfo.AccessToken = result["access_token"].ToString();
+        DevInfo.Expire = DateTime.Now.AddSeconds(Convert.ToDouble(result["expires_in"]) - DevInfo.TokenExpireBuffer);
         return result["access_token"].ToString();
       }
 
-      return _devInfo.AccessToken;
+      return DevInfo.AccessToken;
     }
 
     public async void RetrieveProductsFromAPI()
     {
       var request = new HttpRequestMessage
       {
-        RequestUri = new Uri($"https://api.channeladvisor.com/v1/Products?access_token={GetAccessToken()}&$filter=Sku eq 'ANN0385_001' or Sku eq 'TAE0064'&$expand=Attributes,Labels,Images,DCQuantities"),
+        RequestUri = new Uri($"https://api.channeladvisor.com/v1/Products?access_token={GetAccessToken()}&$filter=Sku eq 'ANN0385_001' or Sku eq 'ANN0238_001'&$expand=Attributes,Labels,Images,DCQuantities"),
         Method = HttpMethod.Get,
       };
 
@@ -81,16 +77,18 @@ namespace ChannelAdvisor.Models
         var attributeId = await _attribute.AddAsync((JArray)p["Attributes"]);
         var inventory = await _inventory.AddInventoryAsync((JArray)p["DCQuantities"]);
 
-        List<string> labelNames = new List<string>();
-        foreach (var obj in (JArray)p["Labels"])
+        var productLabels = (JArray)p["Labels"];
+        List<string> productLabelNames = new List<string>();
+        foreach (var obj in productLabels)
         {
-          var label = await _label.GetLabelByNameAsync(obj["Name"].ToString());
-          await _productLabel.AddAsync(Convert.ToInt32(obj["ProductId"]), label.Id);
-          labelNames.Add(label.Name);
+          productLabelNames.Add((string)obj["Name"]);
         }
+        productLabelNames.Sort();
+        string joinedLabelNames = String.Join(", ", productLabelNames);
 
-        string joinedLabelNames = String.Join(", ", labelNames);
         var productId = await _product.AddAsync(p.ToObject<Product>(), attributeId, inventory, joinedLabelNames);
+        
+        await _label.AddAsync(productId, joinedLabelNames);
       }
     }
   }

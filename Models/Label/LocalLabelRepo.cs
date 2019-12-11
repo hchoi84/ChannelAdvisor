@@ -10,9 +10,19 @@ namespace ChannelAdvisor.Models
   {
     private List<Label> _labels = new List<Label>();
 
-    public async Task<List<Label>> GetProductLabelsAsync(int productId)
+    public async Task<Label> AddAsync(int productId, string joinedLabelName)
     {
-      throw new NotImplementedException();      
+      Label label = new Label()
+      {
+        Id = _labels.Any() ? _labels.Max(l => l.Id) + 1 : 1,
+        ProductId = productId,
+        Labels = joinedLabelName,
+        Created = DateTime.Now,
+      };
+
+      _labels.Add(label);
+      
+      return label;
     }
 
     public async Task<Label> GetLabelAsync(int labelId)
@@ -20,20 +30,15 @@ namespace ChannelAdvisor.Models
       return _labels.FirstOrDefault(l => l.Id == labelId);
     }
 
-    public Task<int> AddSync(string label)
-    {
-      throw new NotImplementedException();
-    }
-
     public async Task<Label> GetLabelByNameAsync(string labelName)
     {
-      var label = _labels.FirstOrDefault(l => l.Name == labelName);
+      var label = _labels.FirstOrDefault(l => l.Labels == labelName);
       if (label == null)
       {
         Label newLabel = new Label()
         {
           Id = _labels.Any() ? _labels.Max(l => l.Id) + 1 : 1,
-          Name = labelName
+          Labels = labelName
         };
 
         _labels.Add(newLabel);

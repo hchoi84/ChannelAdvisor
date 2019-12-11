@@ -6,7 +6,7 @@ namespace ChannelAdvisor.Models
 {
   public interface ILabel
   {
-    Task<List<Label>> GetProductLabelsAsync(int productId);
+    Task<Label> AddAsync(int productId, string joinedLabelName);
     Task<Label> GetLabelByNameAsync(string labelName);
     Task<Label> GetLabelAsync(int labelId);
   }

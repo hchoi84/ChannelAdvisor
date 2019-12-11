@@ -8,17 +8,21 @@ namespace ChannelAdvisor.Models
   public class LocalProductRepo : IProduct
   {
     private readonly IAttribute _attribute;
-    private readonly IProductLabel _productLabel;
     private List<Product> _products = new List<Product>();
 
-    public LocalProductRepo(IAttribute attribute, IProductLabel productLabel)
+    public LocalProductRepo(IAttribute attribute)
     {
       _attribute = attribute;
-      _productLabel = productLabel;
     }
 
     public async Task<int> AddAsync(Product product, int attributeId, Inventory inventory, string joinedLabelNames)
     {
+      Product productInDB = _products.FirstOrDefault(p => p.Id == product.Id) ;
+      if (productInDB != null)
+      {
+        _products.Remove(productInDB);
+      }
+
       product.AttributeId = attributeId;
       product.LabelNames = joinedLabelNames;
       product.QtyFBA = inventory.QtyFBA;

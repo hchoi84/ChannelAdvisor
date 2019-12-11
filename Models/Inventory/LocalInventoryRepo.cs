@@ -27,7 +27,7 @@ namespace ChannelAdvisor.Models
 
     public int GetValue(JArray inventory, int dcId)
     {
-      var obj = inventory.FirstOrDefault(a => Convert.ToInt32(a["DistributionCenterId"]) == dcId);
+      var obj = inventory.FirstOrDefault(a => Convert.ToInt32(a["DistributionCenterID"]) == dcId);
       if (obj != null)
       {
         return Convert.ToInt32(obj["AvailableQuantity"]);
