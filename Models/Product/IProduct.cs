@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace ChannelAdvisor.Models
 {
   public interface IProduct
   {
-    Task<int> AddAsync(Product product, int attributeId, Inventory inventory, string joinedLabelNames);
+    Task<List<Product>> AddProductsAsync(JArray products);
+    Task<List<Product>> AddProductAsync(JObject product);
     Task<List<Product>> GetAllProductsAsync();
-    Task<Product> GetProductAsync(int Id);
+    // Task<Product> GetProductAsync(int Id);
   }
 }

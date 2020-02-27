@@ -1,0 +1,43 @@
+@model List<Product>
+
+@{
+  ViewBag.Title = "No Sales Report";
+}
+
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">SKU</th>
+        <th scope="col">UPC</th>
+        <th scope="col">Create Date Utc</th>
+        <th scope="col">Last Sale Date Utc</th>
+        <th scope="col">All Name</th>
+        <th scope="col">Labels</th>
+        <th scope="col">Qty FBA</th>
+        <th scope="col">Qty WH</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var p in Model)
+      {
+        <tr>
+          <th scope="row">@p.Sku</th>
+          <td>@p.UPC</td>
+          @{
+            DateTime createdDate = Convert.ToDateTime(p.CreateDateUtc);
+            <td>@createdDate.ToString("d")</td>
+          }
+          @{
+            DateTime soldDate = Convert.ToDateTime(p.LastSaleDateUtc);
+            <td>@soldDate.ToString("d")</td>
+          }
+          <td>@p.AllName</td>
+          <td>@p.LabelNames</td>
+          <td>@p.QtyFBA</td>
+          <td>@p.QtyWH</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

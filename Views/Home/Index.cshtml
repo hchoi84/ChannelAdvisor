@@ -4,29 +4,7 @@
   ViewData["Title"] = "Home Page";
 }
 
-<div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Sku</th>
-        <th scope="col">Brand</th>
-        <th scope="col">Retail $</th>
-        <th scope="col">BIN $</th>
-        <th scope="col">Cost</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var p in Model)
-      {
-        <tr>
-          <th scope="row">@p.Sku</th>
-          <td>@p.Brand</td>
-          <td>@p.RetailPrice</td>
-          <td>@p.BuyItNowPrice</td>
-          <td>@p.Cost</td>
-        </tr>
-      }
-    </tbody>
-  </table>
-  
+<form asp-action="NoSales" method="POST">
+  <button type="submit" class="btn btn-primary">No Sales</button>
+</form>
 </div>

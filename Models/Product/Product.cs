@@ -6,7 +6,6 @@ namespace ChannelAdvisor.Models
   public class Product
   {
     public int Id { get; set; }
-    public int AttributeId { get; set; }
     public DateTime CreateDateUtc { get; set; }
     public DateTime UpdateDateUtc { get; set; }
     public DateTime QuantityUpdateDateUtc { get; set; }
@@ -24,16 +23,20 @@ namespace ChannelAdvisor.Models
     public int Length { get; set; }
     public int Width { get; set; }
     public int Weight { get; set; }
-    public float Cost { get; set; }
-    public float RetailPrice { get; set; }
-    public float BuyItNowPrice { get; set; }
+    public float? Cost { get; set; }
+    public float? RetailPrice { get; set; }
+    public float? BuyItNowPrice { get; set; }
     public bool IsParent { get; set; }
     public int? ParentProductID { get; set; }
     public string RelationshipName { get; set; }
 
-    public Attribute Attribute { get; set; }
+    // Attribute properties
+    public string AllName { get; set; }
+
+    // Label properties
     public string LabelNames { get; set; }
     
+    // Quantities properties
     public int QtyFBA { get; set; }
     public int QtyWH { get; set; }
   }

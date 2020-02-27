@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace ChannelAdvisor.Models
 {
   public interface IChannelAdvisor
   {
-    string GetAccessToken();
-    void RetrieveProductsFromAPI();
+    Task<JObject> RetrieveProductsFromAPI(string reqUri);
   }
 }
