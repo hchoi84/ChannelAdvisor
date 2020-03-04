@@ -5,6 +5,6 @@ namespace ChannelAdvisor.Models
 {
   public interface IChannelAdvisor
   {
-    Task<JObject> RetrieveProductsFromAPI(string reqUri);
+    JObject RetrieveProductsFromAPI(string reqUri);
   }
 }

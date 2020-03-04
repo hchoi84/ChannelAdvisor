@@ -29,19 +29,14 @@ namespace ChannelAdvisor.Models
         product.AllName = attributes.FirstOrDefault(prod => prod["Name"].ToString() == "All Name")["Value"].ToString();
 
         var productLabels = (JArray)p["Labels"];
-        // List<string> productLabelNames = new List<string>();
         foreach (var obj in productLabels)
         {
           if (_labels.Contains((string)obj["Name"]))
           {
-            // productLabelNames.Add((string)obj["Name"]);
             product.LabelNames = (string)obj["Name"];
             break;
           }
         }
-        // productLabelNames.Sort();
-        // string joinedLabelNames = string.Join(", ", productLabelNames);
-        // product.LabelNames = joinedLabelNames;
 
         var quantities = (JArray)p["DCQuantities"];
         
@@ -53,17 +48,6 @@ namespace ChannelAdvisor.Models
       }
 
       return _products;
-
-      // Product productInDB = _products.FirstOrDefault(p => p.Id == product.Id) ;
-      // if (productInDB != null)
-      // {
-      //   _products.Remove(productInDB);
-      // }
-
-      // product.LabelNames = joinedLabelNames;
-      // _products.Add(product);
-
-      // return product.Id;
     }
 
     public async Task<List<Product>> AddProductAsync(JObject p)

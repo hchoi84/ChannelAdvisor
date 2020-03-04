@@ -18,7 +18,7 @@ namespace ChannelAdvisor.Models
       _product = product;
     }
 
-    public async Task<JObject> RetrieveProductsFromAPI(string reqUri)
+    public JObject RetrieveProductsFromAPI(string reqUri)
     {
       var request = new HttpRequestMessage
       {
