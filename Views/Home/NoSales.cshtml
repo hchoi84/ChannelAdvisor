@@ -26,11 +26,11 @@
           <td>@p.UPC</td>
           @{
             DateTime createdDate = Convert.ToDateTime(p.CreateDateUtc);
-            <td>@createdDate.ToString("d")</td>
+            <td>@createdDate.ToString("yyyy/MM/dd")</td>
           }
           @{
             DateTime soldDate = Convert.ToDateTime(p.LastSaleDateUtc);
-            <td>@soldDate.ToString("d")</td>
+            <td>@soldDate.ToString("yyyy/MM/dd")</td>
           }
           <td>@p.AllName</td>
           <td>@p.LabelNames</td>

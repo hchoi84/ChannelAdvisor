@@ -21,6 +21,8 @@ namespace ChannelAdvisor.Models
 
     public List<Product> AddProducts(JArray products)
     {
+      List<Task> tasks = new List<Task>();
+      
       foreach (var p in products)
       {
         Product product = p.ToObject<Product>();
@@ -46,34 +48,6 @@ namespace ChannelAdvisor.Models
 
         _products.Add(product);
       }
-
-      return _products;
-    }
-
-    public List<Product> AddProduct(JObject p)
-    {
-      Product product = p.ToObject<Product>();
-
-      var attributes = (JArray)p["Attributes"];
-      product.AllName = attributes.FirstOrDefault(prod => prod["Name"].ToString() == "All Name")["Value"].ToString();
-
-      var productLabels = (JArray)p["Labels"];
-      foreach (var obj in productLabels)
-      {
-        if (_labels.Contains((string)obj["Name"]))
-        {
-          product.LabelNames = (string)obj["Name"];
-          break;
-        }
-      }
-
-      var quantities = (JArray)p["DCQuantities"];
-      
-      var qtyFBA = quantities.FirstOrDefault(q => Convert.ToInt32(q["DistributionCenterID"]) == -4);
-      product.QtyFBA = qtyFBA != null ? (int)qtyFBA["AvailableQuantity"] : 0;
-      product.QtyWH = Convert.ToInt32(quantities.FirstOrDefault(q => Convert.ToInt32(q["DistributionCenterID"]) == 0)["AvailableQuantity"]);
-
-      _products.Add(product);
 
       return _products;
     }
