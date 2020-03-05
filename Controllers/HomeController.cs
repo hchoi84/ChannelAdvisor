@@ -47,7 +47,7 @@ namespace ChannelAdvisor.Controllers
         GetAndStoreProductInfo(filterToGetChilds, filterToGetParents);
       }
       
-      return View((await _product.GetAllProductsAsync()).OrderBy(p => p.Sku).ToList());
+      return View((await _product.GetAllProducts()).OrderBy(p => p.Sku).ToList());
     }
 
     public async Task<List<int>> GetDistinctParentIDs()
@@ -100,20 +100,20 @@ namespace ChannelAdvisor.Controllers
       tasks.Add(Task.Run(async () => {
         reqUri = $"https://api.channeladvisor.com/v1/Products?access_token={DevInfo.GetAccessToken()}&$filter={filterToGetParent}&$expand=Attributes,Labels,DCQuantities";
         result = _channelAdvisor.RetrieveProductsFromAPI(reqUri);
-        await _product.AddProductsAsync((JArray)result["value"]);
+        _product.AddProducts((JArray)result["value"]);
       }));
 
       // Get Childs
       tasks.Add(Task.Run(async () => {
         reqUri = $"https://api.channeladvisor.com/v1/Products?access_token={DevInfo.GetAccessToken()}&$filter=({filterToGetChild}) and TotalAvailableQuantity gt 0&$expand=Attributes,Labels,DCQuantities";
         result = await Task.Run(() => _channelAdvisor.RetrieveProductsFromAPI(reqUri));
-        await _product.AddProductsAsync((JArray)result["value"]);
+        _product.AddProducts((JArray)result["value"]);
         nextUri = (string)result["@odata.nextLink"];
 
         while (nextUri != null)
         {
           result = await Task.Run(() => _channelAdvisor.RetrieveProductsFromAPI(nextUri));
-          await _product.AddProductsAsync((JArray)result["value"]);
+          _product.AddProducts((JArray)result["value"]);
           nextUri = (string)result["@odata.nextLink"];
         }
       }));

@@ -19,7 +19,7 @@ namespace ChannelAdvisor.Models
     {
     }
 
-    public async Task<List<Product>> AddProductsAsync(JArray products)
+    public List<Product> AddProducts(JArray products)
     {
       foreach (var p in products)
       {
@@ -50,7 +50,7 @@ namespace ChannelAdvisor.Models
       return _products;
     }
 
-    public async Task<List<Product>> AddProductAsync(JObject p)
+    public List<Product> AddProduct(JObject p)
     {
       Product product = p.ToObject<Product>();
 
@@ -78,19 +78,6 @@ namespace ChannelAdvisor.Models
       return _products;
     }
 
-    public async Task<List<Product>> GetAllProductsAsync()
-    {
-      // var products = _products;
-      // foreach (var p in products)
-      // {
-      //   p.Attribute = await _attribute.GetAttributeAsync(p.AttributeId);
-      // }
-      return _products;
-    }
-
-    // public async Task<Product> GetProductAsync(int id)
-    // {
-    //   return _products.FirstOrDefault(p => p.Id == id);
-    // }
+    public List<Product> GetAllProducts() => _products;
   }
 }

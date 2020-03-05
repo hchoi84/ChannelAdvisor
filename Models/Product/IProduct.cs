@@ -6,9 +6,8 @@ namespace ChannelAdvisor.Models
 {
   public interface IProduct
   {
-    Task<List<Product>> AddProductsAsync(JArray products);
-    Task<List<Product>> AddProductAsync(JObject product);
-    Task<List<Product>> GetAllProductsAsync();
-    // Task<Product> GetProductAsync(int Id);
+    List<Product> AddProducts(JArray products);
+    List<Product> AddProduct(JObject product);
+    List<Product> GetAllProducts();
   }
 }
