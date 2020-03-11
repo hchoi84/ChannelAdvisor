@@ -7,9 +7,11 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChannelAdvisor.Controllers
 {
+  [AllowAnonymous]
   public class HomeController : Controller
   {
     private readonly ILogger<HomeController> _logger;
@@ -23,9 +25,11 @@ namespace ChannelAdvisor.Controllers
       _channelAdvisor = channelAdvisor;
     }
 
+    [HttpGet("/")]
     public IActionResult Index() => View();
     
-    [HttpPost]
+    #region [HttpPost("NoSales")]
+    [HttpPost("NoSales")]
     public async Task<IActionResult> NoSales()
     {
       List<int> distinctParentProductIDs = new List<int>();
@@ -56,7 +60,7 @@ namespace ChannelAdvisor.Controllers
       string reqUri, nextUri;
       JObject result;
 
-      reqUri = $"https://api.channeladvisor.com/v1/Products/?access_token={DevInfo.GetAccessToken()}&$filter=LastSaleDateUtc lt 2016-04-01";
+      reqUri = $"https://api.channeladvisor.com/v1/Products/?access_token={DevInfo.GetAccessToken()}&$filter=LastSaleDateUtc lt 2016-05-01";
       result = _channelAdvisor.RetrieveProductsFromAPI(reqUri);
 
       var noSaleProducts = (JArray)result["value"];
@@ -118,6 +122,7 @@ namespace ChannelAdvisor.Controllers
 
       Task.WaitAll(tasks.ToArray());
     }
+    #endregion
     
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
