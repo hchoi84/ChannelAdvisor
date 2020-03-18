@@ -9,5 +9,7 @@ namespace ChannelAdvisor.Models
   {
     Task<IdentityResult> RegisterAsync(RegisterViewModel regiterViewModel);
     GolfioUser GetUserInfo(string email);
+    Task<string> CreateEmailConfirmationToken(GolfioUser golfioUser);
+    Task<IdentityResult> ConfirmEmailTokenAsync(GolfioUser golfioUser, string token);
   }
 }

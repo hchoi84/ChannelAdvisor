@@ -5,3 +5,4 @@ appsettings.Development.json
 bin
 obj
 Migrations
+EmailClient.cs

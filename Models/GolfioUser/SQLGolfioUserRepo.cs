@@ -33,7 +33,21 @@ namespace ChannelAdvisor.Models
 
     public GolfioUser GetUserInfo(string email)
     {
-      return _db.GolfioUsers.FirstOrDefault(golfioUser => golfioUser.Email == email);
+      if (email.Contains("@"))
+        return _db.GolfioUsers.FirstOrDefault(golfioUser => golfioUser.Email == email);
+      else
+        return _db.GolfioUsers.FirstOrDefault(golfioUser => golfioUser.Id == email);
+    }
+
+    public async Task<string> CreateEmailConfirmationToken(GolfioUser golfioUser)
+    {
+      return await _golfioUser.GenerateEmailConfirmationTokenAsync(golfioUser);
+    }
+
+    public async Task<IdentityResult> ConfirmEmailTokenAsync(GolfioUser golfioUser, string token)
+    {
+      return await _golfioUser.ConfirmEmailAsync(golfioUser, token);
+      
     }
   }
 }
