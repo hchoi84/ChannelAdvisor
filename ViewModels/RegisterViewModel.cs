@@ -23,10 +23,10 @@ namespace ChannelAdvisor.ViewModels
     [DataType(DataType.EmailAddress)]
     public string Email { get; set; }
 
-    [Required(ErrorMessage = "Must choose an option")]
+    [Required(ErrorMessage = "Must choose a location")]
     [Display(Name = "Office Location")]
     [DataType(DataType.Text)]
-    public OfficeLocation OfficeLocation { get; set; }
+    public string OfficeLocation { get; set; }
 
     [Required(ErrorMessage = "Password is required")]
     [Display(Name = "Password")]
@@ -39,8 +39,5 @@ namespace ChannelAdvisor.ViewModels
     [DataType(DataType.Password)]
     [Compare("Password", ErrorMessage = "Does not match with Password")]
     public string PasswordConfirm { get; set; }
-
-    public DateTime Created { get; set; } = DateTime.Now;
-    public DateTime Updated { get; set; } = DateTime.Now;
   }
 }
