@@ -60,7 +60,7 @@ namespace ChannelAdvisor.Controllers
       string reqUri, nextUri;
       JObject result;
 
-      reqUri = $"https://api.channeladvisor.com/v1/Products/?access_token={DevInfo.GetAccessToken()}&$filter=LastSaleDateUtc lt 2016-05-01";
+      reqUri = $"https://api.channeladvisor.com/v1/Products/?access_token={DevInfo.GetAccessToken()}&$filter=LastSaleDateUtc lt 2016-07-01";
       result = _channelAdvisor.RetrieveProductsFromAPI(reqUri);
 
       var noSaleProducts = (JArray)result["value"];
@@ -79,7 +79,9 @@ namespace ChannelAdvisor.Controllers
 
         foreach (JToken product in noSaleProducts)
         {
-          parentProductIDs.Add(Convert.ToInt32(product["ParentProductID"]));
+          int parentProductId;
+          Int32.TryParse(Convert.ToString(product["ParentProductID"]), out parentProductId);
+          parentProductIDs.Add(parentProductId);
         }
       }
 
