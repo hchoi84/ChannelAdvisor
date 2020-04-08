@@ -33,7 +33,6 @@ namespace ChannelAdvisor.Controllers
     }
 
     // TODO: If error from server, display error message (ex: duplicate username)
-    // TODO: Create message view
     [HttpPost("/register")]
     public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
     {
@@ -54,7 +53,7 @@ namespace ChannelAdvisor.Controllers
 
         TempData["MessageTitle"] = "Registration Success";
         TempData["Message"] = "Please check your email for confirmation link";
-        
+
         return RedirectToAction("Login");
       }
       else
@@ -66,7 +65,9 @@ namespace ChannelAdvisor.Controllers
           errors.Add(error.Code, error.Description);
         }
 
-        return Json(errors);
+        ViewBag.Errors = errors;
+        // return Json(errors);
+        return View();
       }
     }
 
