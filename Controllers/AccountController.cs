@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using ChannelAdvisor.Models;
+using ChannelAdvisor.Securities;
 using ChannelAdvisor.ViewModels;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 
 namespace ChannelAdvisor.Controllers
 {
@@ -23,7 +27,10 @@ namespace ChannelAdvisor.Controllers
     public IActionResult Login() => View();
 
     [HttpGet("/register")]
-    public IActionResult Register() => View();
+    public IActionResult Register()
+    {
+      return View();
+    }
 
     // TODO: If error from server, display error message (ex: duplicate username)
     // TODO: Create message view
@@ -43,9 +50,12 @@ namespace ChannelAdvisor.Controllers
         var token = await _golfioUser.CreateEmailConfirmationToken(golfioUser);
         var tokenLink = Url.Action("ConfirmEmail", "Account", new { userId = golfioUser.Id, token = token }, Request.Scheme);
         
-        EmailClient.SendEmailConfirmationLink(golfioUser, tokenLink);
+        SendEmailConfirmationLink(golfioUser, tokenLink);
 
-        return Json($"Hello {golfioUser.GetFullName}. Your confirmation email has been sent");
+        TempData["MessageTitle"] = "Registration Success";
+        TempData["Message"] = "Please check your email for confirmation link";
+        
+        return RedirectToAction("Login");
       }
       else
       {
@@ -86,6 +96,34 @@ namespace ChannelAdvisor.Controllers
       else
       {
         return Json("Failed");
+      }
+    }
+
+    public void SendEmailConfirmationLink(GolfioUser golfioUser, string tokenLink)
+    {
+      string EmailSubject;
+
+      EmailSecret emailSecret = new EmailSecret();
+      EmailSubject = "Please confirm your email";
+      MailboxAddress from = new MailboxAddress("Golfio Admin", emailSecret.emailAddress);
+      MailboxAddress to = new MailboxAddress(golfioUser.GetFullName, golfioUser.Email);
+
+      BodyBuilder bodyBuilder = new BodyBuilder();
+      bodyBuilder.TextBody = tokenLink;
+
+      MimeMessage message = new MimeMessage();
+      message.From.Add(from);
+      message.To.Add(to);
+      message.Subject = EmailSubject;
+      message.Body = bodyBuilder.ToMessageBody();
+
+      using (SmtpClient client = new SmtpClient())
+      {
+        client.SslProtocols = SslProtocols.Tls;
+        client.Connect(emailSecret.smtpServerAddress, emailSecret.port, emailSecret.useSSL);
+        client.Authenticate(emailSecret.emailAddress, emailSecret.apiPassword);
+        client.Send(message);
+        client.Disconnect(true);
       }
     }
   }

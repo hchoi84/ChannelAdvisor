@@ -1,8 +1,10 @@
-DevInfo.cs
-appsettings.json
-appsettings.Development.json
 .vscode
 bin
 obj
 Migrations
-EmailClient.cs
+
+appsettings.json
+appsettings.Development.json
+
+DevInfo.cs
+EmailSecret.cs

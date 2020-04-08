@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
+using ChannelAdvisor.Securities;
+using MailKit.Net.Smtp;
+using MimeKit;
 using Newtonsoft.Json.Linq;
 
 namespace ChannelAdvisor.Models
