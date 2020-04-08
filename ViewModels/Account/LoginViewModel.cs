@@ -17,8 +17,6 @@ namespace ChannelAdvisor.ViewModels
     [Display(Name = "Remember me")]
     public bool RememberMe { get; set; }
 
-    public string ReturnURL { get; set; }
-
     public IList<AuthenticationScheme> ExternalLogins { get; set; }
   }
 }

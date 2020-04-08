@@ -40,6 +40,8 @@ namespace ChannelAdvisor
       services.AddScoped<IGolfioUser, SQLGolfioUserRepo>();
 
       services.AddDbContextPool<AppDbContext>(options => options.UseMySql(Configuration.GetConnectionString(DBConnectionInfo)));
+
+      services.AddSession();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,6 +61,8 @@ namespace ChannelAdvisor
 
       app.UseAuthentication();
       app.UseAuthorization();
+
+      app.UseSession();
 
       app.UseEndpoints(endpoints =>
       {
