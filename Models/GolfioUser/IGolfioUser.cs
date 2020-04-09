@@ -13,5 +13,8 @@ namespace ChannelAdvisor.Models
     Task<bool> IsValidLoginAsync(GolfioUser golfioUser, string password);
     Task<SignInResult> SignInUserAsync(LoginViewModel loginVM);
     Task SignOutUserAsync();
+    Task<GolfioUser> FindByEmailAsync(string email);
+    Task<string> GeneratePasswordResetTokenAsync(GolfioUser golfioUser);
+    Task<IdentityResult> ResetPasswordAsync(ResetPasswordViewModel resetPasswordVM);
   }
 }

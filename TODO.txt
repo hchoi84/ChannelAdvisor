@@ -1,0 +1,12 @@
+Claims:
+- Add Authorization to Startup.cs
+- Add Access Denied path
+- Assign appropriate claims to each new user in SQLGolfioUserRepo.cs
+- Edit claims
+
+AdminController
+- Allow Admin to edit user claims
+
+UserController:
+- Edit user info
+- Change password

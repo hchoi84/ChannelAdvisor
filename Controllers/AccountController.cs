@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using ChannelAdvisor.Models;
 using ChannelAdvisor.Securities;
+using ChannelAdvisor.Utilities;
 using ChannelAdvisor.ViewModels;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
@@ -24,10 +27,10 @@ namespace ChannelAdvisor.Controllers
       _golfioUser = golfioUser;
     }
 
-    [HttpGet("/login")]
+    [HttpGet("/Login")]
     public IActionResult Login() => View();
 
-    [HttpPost("/login")]
+    [HttpPost("/Login")]
     public async Task<IActionResult> Login(LoginViewModel loginVM, string returnUrl)
     {
       GolfioUser golfioUser = new GolfioUser();
@@ -78,10 +81,10 @@ namespace ChannelAdvisor.Controllers
       }
     }
 
-    [HttpGet("/register")]
+    [HttpGet("/Register")]
     public IActionResult Register() => View();
 
-    [HttpPost("/register")]
+    [HttpPost("/Register")]
     public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
     {
       if (!ModelState.IsValid)
@@ -97,7 +100,7 @@ namespace ChannelAdvisor.Controllers
         var token = await _golfioUser.CreateEmailConfirmationToken(golfioUser);
         var tokenLink = Url.Action("ConfirmEmail", "Account", new { userId = golfioUser.Id, token = token }, Request.Scheme);
         
-        SendEmailConfirmationLink(golfioUser, tokenLink);
+        EmailToken(golfioUser, tokenLink, EmailType.EmailConfirmation);
 
         TempData["MessageTitle"] = "Registration Success";
         TempData["Message"] = "Please check your email for confirmation link";
@@ -119,7 +122,7 @@ namespace ChannelAdvisor.Controllers
       }
     }
 
-    [HttpGet("/emailconfirmation")]
+    [HttpGet("/EmailConfirmation")]
     public async Task<IActionResult> ConfirmEmail(string userId, string token)
     {
       if (userId == null || token == null)
@@ -158,7 +161,7 @@ namespace ChannelAdvisor.Controllers
       }
     }
 
-    [HttpPost("/logout")]
+    [HttpPost("/Logout")]
     public async Task<IActionResult> Logout()
     {
       await _golfioUser.SignOutUserAsync();
@@ -170,7 +173,93 @@ namespace ChannelAdvisor.Controllers
       return RedirectToAction("Login");
     }
 
-    public void SendEmailConfirmationLink(GolfioUser golfioUser, string tokenLink)
+    [HttpGet("/ForgotPassword")]
+    public IActionResult ForgotPassword() => View();
+
+    [HttpPost("/ForgotPassword")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel forgotPasswordVM)
+    {
+      if (!ModelState.IsValid)
+      {
+        return View();
+      }
+
+      GolfioUser golfioUser = await _golfioUser.FindByEmailAsync(forgotPasswordVM.Email);
+
+      if (golfioUser == null)
+      {
+        TempData["MessageTitle"] = "Invalid Email";
+        TempData["Message"] = "Please ensure the email is correct and you've already registered";
+        return RedirectToAction("Login");
+      }
+
+      if (!golfioUser.EmailConfirmed)
+      {
+        TempData["MessageTitle"] = "Email Not Confirmed";
+        TempData["Message"] = "You have not confirmed your email yet";
+        return RedirectToAction("Login");
+      }
+
+      string token = await _golfioUser.GeneratePasswordResetTokenAsync(golfioUser);
+
+      var passwordResetLink = Url.Action("ResetPassword", "Account", new { email = forgotPasswordVM.Email, token = token }, Request.Scheme);
+
+      EmailToken(golfioUser, passwordResetLink, EmailType.PasswordReset);
+
+      TempData["MessageTitle"] = "Email Sent";
+      TempData["Message"] = "Please check your email for password reset link";
+      
+      return RedirectToAction("Login");
+    }
+
+    [HttpGet("/ResetPassword")]
+    public IActionResult ResetPassword(string email, string token)
+    {
+      if (token == null || email == null)
+      {
+        TempData["MessageTitle"] = "Invalid Token";
+        TempData["Message"] = "Invalid password reset token";
+        return RedirectToAction("Login");
+      }
+
+      return View();
+    }
+
+    [HttpPost("/ResetPassword")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPasswordVM)
+    {
+      if (!ModelState.IsValid)
+      {
+        return View();
+      }
+
+      IdentityResult identityResult = await _golfioUser.ResetPasswordAsync(resetPasswordVM);
+
+      if (identityResult.Errors.Any())
+      {
+        List<string> errorMessages = new List<string>();
+        string errMsg;
+        
+        foreach (var error in identityResult.Errors)
+        {
+          errorMessages.Add(error.Description);
+        }
+
+        errMsg = String.Join(", ", errorMessages);
+
+        TempData["MessageTitle"] = "Error";
+        TempData["Message"] = $"{errMsg}";
+        
+        return RedirectToAction("Login");
+      }
+
+      TempData["MessageTitle"] = "Success";
+      TempData["Message"] = "Password has been reset successfully";
+
+      return RedirectToAction("Login");
+    }
+
+    public void EmailToken(GolfioUser golfioUser, string tokenLink, EmailType emailType)
     {
       string EmailSubject;
 
@@ -180,7 +269,28 @@ namespace ChannelAdvisor.Controllers
       MailboxAddress to = new MailboxAddress(golfioUser.GetFullName, golfioUser.Email);
 
       BodyBuilder bodyBuilder = new BodyBuilder();
-      bodyBuilder.TextBody = tokenLink;
+      if (emailType == EmailType.EmailConfirmation)
+      {
+        bodyBuilder.HtmlBody =
+          $"<h1>Hello {golfioUser.GetFullName} </h1> \n\n" +
+          "<p>You've recently registered for Project Tracker</p> \n\n" +
+          "<p>Please click below to confirm your email address</p> \n\n" +
+          $"<a href='{tokenLink}'><button style='color:#fff; background-color:#007bff; border-color:#007bff;'>Confirm</button></a> \n\n" +
+          "<p>If the link doesn't work, you can copy and paste the below URL</p> \n\n" +
+          $"<p> {tokenLink} </p> \n\n\n" +
+          "<p>Thank you!</p>";
+      }
+      else
+      {
+        bodyBuilder.HtmlBody =
+          $"<h1>Hello {golfioUser.GetFullName} </h1> \n\n" +
+          "<p>You've recently requested for password reset</p> \n\n" +
+          "<p>Please click below to reset your password</p> \n\n" +
+          $"<a href='{tokenLink}'><button style='color:#fff; background-color:#007bff; border-color:#007bff;'>Confirm</button></a> \n\n" +
+          "<p>If the link doesn't work, you can copy and paste the below URL</p> \n\n" +
+          $"<p> {tokenLink} </p> \n\n\n" +
+          "<p>Thank you!</p>";
+      }
 
       MimeMessage message = new MimeMessage();
       message.From.Add(from);

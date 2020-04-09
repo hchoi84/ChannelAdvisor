@@ -2,6 +2,7 @@ using ChannelAdvisor.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,7 @@ namespace ChannelAdvisor
       DBConnectionInfo = "DbConnection";
     }
 
-    // This method gets called by the runtime. Use this method to add services to the container.
+    // TODO: Implement claims
     public void ConfigureServices(IServiceCollection services)
     {
       // services.AddControllersWithViews().AddNewtonsoftJson();
@@ -34,6 +35,13 @@ namespace ChannelAdvisor
       services.AddIdentity<GolfioUser, IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
+
+      // Must go after .AddIdentity
+      services.ConfigureApplicationCookie(options => 
+      {
+        options.AccessDeniedPath = new PathString("/AccessDenied");
+        options.LoginPath = new PathString("/Login");
+      });
 
       services.AddSingleton<IChannelAdvisor, ChannelAdvisorAPI>();
       services.AddSingleton<IProduct, LocalProductRepo>();

@@ -8,17 +8,18 @@ namespace ChannelAdvisor.Models
 {
   public class SQLGolfioUserRepo : IGolfioUser
   {
-    private readonly UserManager<GolfioUser> _golfioUser;
+    private readonly UserManager<GolfioUser> _userManager;
     private readonly AppDbContext _db;
     private readonly SignInManager<GolfioUser> _signInManager;
 
-    public SQLGolfioUserRepo(UserManager<GolfioUser> golfioUser, AppDbContext db, SignInManager<GolfioUser> signInManager)
+    public SQLGolfioUserRepo(UserManager<GolfioUser> userManager, AppDbContext db, SignInManager<GolfioUser> signInManager)
     {
-      _golfioUser = golfioUser;
+      _userManager = userManager;
       _db = db;
       _signInManager = signInManager;
     }
 
+    // TODO: Assign user to the appropriate claims
     public async Task<IdentityResult> RegisterAsync(RegisterViewModel registerViewModel)
     {
       GolfioUser golfioUser = new GolfioUser
@@ -30,7 +31,7 @@ namespace ChannelAdvisor.Models
         OfficeLocation = Enum.GetName(typeof(OfficeLocation), Convert.ToInt32(registerViewModel.OfficeLocation)),
       };
 
-      return await _golfioUser.CreateAsync(golfioUser, registerViewModel.Password);
+      return await _userManager.CreateAsync(golfioUser, registerViewModel.Password);
     }
 
     public async Task<GolfioUser> GetUserInfoAsync(string email)
@@ -43,17 +44,17 @@ namespace ChannelAdvisor.Models
 
     public async Task<string> CreateEmailConfirmationToken(GolfioUser golfioUser)
     {
-      return await _golfioUser.GenerateEmailConfirmationTokenAsync(golfioUser);
+      return await _userManager.GenerateEmailConfirmationTokenAsync(golfioUser);
     }
 
     public async Task<IdentityResult> ConfirmEmailTokenAsync(GolfioUser golfioUser, string token)
     {
-      return await _golfioUser.ConfirmEmailAsync(golfioUser, token);
+      return await _userManager.ConfirmEmailAsync(golfioUser, token);
     }
 
     public async Task<bool> IsValidLoginAsync(GolfioUser golfioUser, string password)
     {
-      bool isValidPassword = await _golfioUser.CheckPasswordAsync(golfioUser, password);
+      bool isValidPassword = await _userManager.CheckPasswordAsync(golfioUser, password);
       bool isValidEmail = golfioUser.EmailConfirmed;
 
       return isValidPassword && isValidEmail;
@@ -65,5 +66,22 @@ namespace ChannelAdvisor.Models
     }
 
     public async Task SignOutUserAsync() => await _signInManager.SignOutAsync();
+
+    public async Task<GolfioUser> FindByEmailAsync(string email)
+    {
+      return await _db.GolfioUsers.FirstOrDefaultAsync(golfioUser => golfioUser.Email == email);
+    }
+
+    public async Task<string> GeneratePasswordResetTokenAsync(GolfioUser golfioUser)
+    {
+      return await _userManager.GeneratePasswordResetTokenAsync(golfioUser);
+    }
+
+    public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordViewModel resetPasswordVM)
+    {
+      GolfioUser golfioUser = await _db.GolfioUsers.FirstOrDefaultAsync(golfioUser => golfioUser.Email == resetPasswordVM.Email);
+
+      return await _userManager.ResetPasswordAsync(golfioUser, resetPasswordVM.Token, resetPasswordVM.Password);
+    }
   }
 }
