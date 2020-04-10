@@ -21,10 +21,12 @@ namespace ChannelAdvisor.Controllers
   public class AccountController : Controller
   {
     private readonly IGolfioUser _golfioUser;
+    private readonly IEmail _email;
 
-    public AccountController(IGolfioUser golfioUser)
+    public AccountController(IGolfioUser golfioUser, IEmail email)
     {
       _golfioUser = golfioUser;
+      _email = email;
     }
 
     [HttpGet("/Login")]
@@ -100,7 +102,7 @@ namespace ChannelAdvisor.Controllers
         var token = await _golfioUser.CreateEmailConfirmationToken(golfioUser);
         var tokenLink = Url.Action("ConfirmEmail", "Account", new { userId = golfioUser.Id, token = token }, Request.Scheme);
         
-        EmailToken(golfioUser, tokenLink, EmailType.EmailConfirmation);
+        _email.EmailToken(golfioUser, tokenLink, EmailType.EmailConfirmation);
 
         TempData["MessageTitle"] = "Registration Success";
         TempData["Message"] = "Please check your email for confirmation link";
@@ -204,7 +206,7 @@ namespace ChannelAdvisor.Controllers
 
       var passwordResetLink = Url.Action("ResetPassword", "Account", new { email = forgotPasswordVM.Email, token = token }, Request.Scheme);
 
-      EmailToken(golfioUser, passwordResetLink, EmailType.PasswordReset);
+      _email.EmailToken(golfioUser, passwordResetLink, EmailType.PasswordReset);
 
       TempData["MessageTitle"] = "Email Sent";
       TempData["Message"] = "Please check your email for password reset link";
@@ -257,55 +259,6 @@ namespace ChannelAdvisor.Controllers
       TempData["Message"] = "Password has been reset successfully";
 
       return RedirectToAction("Login");
-    }
-
-    public void EmailToken(GolfioUser golfioUser, string tokenLink, EmailType emailType)
-    {
-      string EmailSubject;
-
-      EmailSecret emailSecret = new EmailSecret();
-      EmailSubject = "Please confirm your email";
-      MailboxAddress from = new MailboxAddress("Golfio Admin", emailSecret.emailAddress);
-      MailboxAddress to = new MailboxAddress(golfioUser.GetFullName, golfioUser.Email);
-
-      BodyBuilder bodyBuilder = new BodyBuilder();
-      if (emailType == EmailType.EmailConfirmation)
-      {
-        bodyBuilder.HtmlBody =
-          $"<h1>Hello {golfioUser.GetFullName} </h1> \n\n" +
-          "<p>You've recently registered for Project Tracker</p> \n\n" +
-          "<p>Please click below to confirm your email address</p> \n\n" +
-          $"<a href='{tokenLink}'><button style='color:#fff; background-color:#007bff; border-color:#007bff;'>Confirm</button></a> \n\n" +
-          "<p>If the link doesn't work, you can copy and paste the below URL</p> \n\n" +
-          $"<p> {tokenLink} </p> \n\n\n" +
-          "<p>Thank you!</p>";
-      }
-      else
-      {
-        bodyBuilder.HtmlBody =
-          $"<h1>Hello {golfioUser.GetFullName} </h1> \n\n" +
-          "<p>You've recently requested for password reset</p> \n\n" +
-          "<p>Please click below to reset your password</p> \n\n" +
-          $"<a href='{tokenLink}'><button style='color:#fff; background-color:#007bff; border-color:#007bff;'>Confirm</button></a> \n\n" +
-          "<p>If the link doesn't work, you can copy and paste the below URL</p> \n\n" +
-          $"<p> {tokenLink} </p> \n\n\n" +
-          "<p>Thank you!</p>";
-      }
-
-      MimeMessage message = new MimeMessage();
-      message.From.Add(from);
-      message.To.Add(to);
-      message.Subject = EmailSubject;
-      message.Body = bodyBuilder.ToMessageBody();
-
-      using (SmtpClient client = new SmtpClient())
-      {
-        client.SslProtocols = SslProtocols.Tls;
-        client.Connect(emailSecret.smtpServerAddress, emailSecret.port, emailSecret.useSSL);
-        client.Authenticate(emailSecret.emailAddress, emailSecret.apiPassword);
-        client.Send(message);
-        client.Disconnect(true);
-      }
     }
   }
 }

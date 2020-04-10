@@ -45,7 +45,9 @@ namespace ChannelAdvisor
 
       services.AddSingleton<IChannelAdvisor, ChannelAdvisorAPI>();
       services.AddSingleton<IProduct, LocalProductRepo>();
+
       services.AddScoped<IGolfioUser, SQLGolfioUserRepo>();
+      services.AddScoped<IEmail, Email>();
 
       services.AddDbContextPool<AppDbContext>(options => options.UseMySql(Configuration.GetConnectionString(DBConnectionInfo)));
 
