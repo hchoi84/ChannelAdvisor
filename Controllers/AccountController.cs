@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Authentication;
 using System.Threading.Tasks;
 using ChannelAdvisor.Models;
-using ChannelAdvisor.Securities;
 using ChannelAdvisor.Utilities;
 using ChannelAdvisor.ViewModels;
-using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MimeKit;
+using Microsoft.Extensions.Logging;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace ChannelAdvisor.Controllers
@@ -22,11 +19,13 @@ namespace ChannelAdvisor.Controllers
   {
     private readonly IGolfioUser _golfioUser;
     private readonly IEmail _email;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IGolfioUser golfioUser, IEmail email)
+    public AccountController(IGolfioUser golfioUser, IEmail email, ILogger<AccountController> logger)
     {
       _golfioUser = golfioUser;
       _email = email;
+      _logger = logger;
     }
 
     [HttpGet("/Login")]
@@ -101,8 +100,9 @@ namespace ChannelAdvisor.Controllers
         GolfioUser golfioUser = await _golfioUser.GetUserInfoAsync(registerViewModel.Email);
         var token = await _golfioUser.CreateEmailConfirmationToken(golfioUser);
         var tokenLink = Url.Action("ConfirmEmail", "Account", new { userId = golfioUser.Id, token = token }, Request.Scheme);
-        
-        _email.EmailToken(golfioUser, tokenLink, EmailType.EmailConfirmation);
+
+        // _email.EmailToken(golfioUser, tokenLink, EmailType.EmailConfirmation);
+        _logger.Log(LogLevel.Warning, tokenLink);
 
         TempData["MessageTitle"] = "Registration Success";
         TempData["Message"] = "Please check your email for confirmation link";

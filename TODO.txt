@@ -1,12 +1,12 @@
-Claims:
-- Add Authorization to Startup.cs
-- Add Access Denied path
-- Assign appropriate claims to each new user in SQLGolfioUserRepo.cs
-- Edit claims
-
 AdminController
-- Allow Admin to edit user claims
-
-UserController:
+- Index: Displays all users and their claims
+  - Only ADMIN is allowed
+  - Selecting Admin claim will remove all others
+  - Selecting non-Admin claim will remove the user from being an Admin
+  - Batch update capability
+  - Sort by user name
 - Edit user info
 - Change password
+
+ChannelAdvisor
+- Separate Secrets and Methods in DevInfo.cs

@@ -1,11 +1,15 @@
 ﻿@model List<Product>
+@inject IAuthorizationService _authService
 
 @{
   ViewData["Title"] = "Home Page";
 }
 
-<div class="container">
-  <form asp-action="NoSales" method="POST">
-    <button type="submit" class="btn btn-primary">No Sales</button>
-  </form>
-</div>
+@if ((await _authService.AuthorizeAsync(User, ClaimType.NoSale.ToString())).Succeeded)
+{
+  <div class="container">
+    <form asp-controller="ChannelAdvisor" asp-action="NoSales" method="POST">
+      <button type="submit" class="btn btn-primary">No Sales</button>
+    </form>
+  </div>
+}

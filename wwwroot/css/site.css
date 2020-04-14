@@ -9,7 +9,12 @@ a.navbar-brand {
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+  color: #fff;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #fff;
 }
 
 .btn-primary {
@@ -74,4 +79,12 @@ body {
 /* CUSTOM */
 .table td, .table th {
   padding: 0;
+}
+
+.fa-trash-alt:hover{
+  color: #dc3545;
+}
+
+.fa-edit:hover{
+  color: #007bff;
 }

@@ -52,6 +52,15 @@ namespace ChannelAdvisor
       services.AddDbContextPool<AppDbContext>(options => options.UseMySql(Configuration.GetConnectionString(DBConnectionInfo)));
 
       services.AddSession();
+
+      services.AddAuthorization(options =>
+      {
+        options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimType.Admin.ToString(), "true"));
+        
+        options.AddPolicy("NoSale", policy => policy.RequireAssertion(context =>
+          context.User.HasClaim(claim => claim.Type == ClaimType.Admin.ToString() && claim.Value == "true") || 
+          context.User.HasClaim(claim => claim.Type == ClaimType.NoSale.ToString() && claim.Value == "true")));
+      });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

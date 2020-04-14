@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using ChannelAdvisor.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -16,5 +18,7 @@ namespace ChannelAdvisor.Models
     Task<GolfioUser> FindByEmailAsync(string email);
     Task<string> GeneratePasswordResetTokenAsync(GolfioUser golfioUser);
     Task<IdentityResult> ResetPasswordAsync(ResetPasswordViewModel resetPasswordVM);
+    Task<List<GolfioUser>> GetAllUsersAsync();
+    Task<List<Claim>> GetUserClaimsAsync(GolfioUser golfioUser);
   }
 }

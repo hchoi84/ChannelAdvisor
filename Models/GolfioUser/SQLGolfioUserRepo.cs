@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using ChannelAdvisor.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -31,7 +34,27 @@ namespace ChannelAdvisor.Models
         OfficeLocation = Enum.GetName(typeof(OfficeLocation), Convert.ToInt32(registerViewModel.OfficeLocation)),
       };
 
-      return await _userManager.CreateAsync(golfioUser, registerViewModel.Password);
+      IdentityResult identityResult = await _userManager.CreateAsync(golfioUser, registerViewModel.Password);
+
+      if (!identityResult.Succeeded)
+      {
+        return identityResult;
+      }
+
+      var userCount = _userManager.Users.Count();
+
+      if (userCount <= 1)
+      {
+        Claim newClaim = new Claim(ClaimType.Admin.ToString(), "true");
+        identityResult = await _userManager.AddClaimAsync(golfioUser, newClaim);
+      }
+      else
+      {
+        Claim newClaim = new Claim(ClaimType.User.ToString(), "true");
+        identityResult = await _userManager.AddClaimAsync(golfioUser, newClaim);
+      }
+
+      return identityResult;
     }
 
     public async Task<GolfioUser> GetUserInfoAsync(string email)
@@ -82,6 +105,16 @@ namespace ChannelAdvisor.Models
       GolfioUser golfioUser = await _db.GolfioUsers.FirstOrDefaultAsync(golfioUser => golfioUser.Email == resetPasswordVM.Email);
 
       return await _userManager.ResetPasswordAsync(golfioUser, resetPasswordVM.Token, resetPasswordVM.Password);
+    }
+
+    public async Task<List<GolfioUser>> GetAllUsersAsync()
+    {
+      return await _db.GolfioUsers.ToListAsync();
+    }
+
+    public async Task<List<Claim>> GetUserClaimsAsync(GolfioUser golfioUser)
+    {
+      return (await _userManager.GetClaimsAsync(golfioUser)).ToList();
     }
   }
 }

@@ -1,0 +1,42 @@
+@model List<AdminIndexViewModel>
+@{ ViewBag.Title = "Admin"; }
+
+<div class="container">
+  <div class="row row-height-3 align-items-center border-bottom border-white">
+    <div class="col-4">Name</div>
+    <div class="col">A.P.</div>
+    <div class="col">Action</div>
+  </div>
+
+  @if (Model.Any())
+  {
+    @for (int i = 0; i < Model.Count(); i++)
+    {
+      <div class="row row-height-3 align-items-center mt-3 bg-secondary">
+        <div class="col-4">@Model[i].FullName</div>
+        <div class="col">
+          @if (Model[i].Claims.Count() <= 1)
+          {
+            @Model[i].Claims.First().Type.ToString()
+          }
+          else
+          {
+            @foreach (var claim in Model[i].Claims)
+            {
+              @claim.Type.ToString()<br>
+            }
+          }
+
+        </div>
+        <div class="col">
+          <a asp-action="Edit" asp-route-userId="@Model[i].Id">
+            <i class="far fa-edit fa-lg mr-2"></i>
+          </a>
+          <a asp-action="Delete" asp-route-userId="@Model[i].Id">
+            <i class="far fa-trash-alt fa-lg mr-2"></i>
+          </a>
+        </div>
+      </div>
+    }
+  }
+</div>
