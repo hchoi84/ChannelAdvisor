@@ -43,7 +43,7 @@ namespace ChannelAdvisor.Controllers
         return View(loginVM);
       }
 
-      golfioUser = await _golfioUser.GetUserInfoAsync(loginVM.Email);
+      golfioUser = await _golfioUser.GetUserAsync(loginVM.Email);
 
       if (golfioUser == null)
       {
@@ -97,7 +97,7 @@ namespace ChannelAdvisor.Controllers
 
       if (result.Succeeded)
       {
-        GolfioUser golfioUser = await _golfioUser.GetUserInfoAsync(registerViewModel.Email);
+        GolfioUser golfioUser = await _golfioUser.GetUserAsync(registerViewModel.Email);
         var token = await _golfioUser.CreateEmailConfirmationToken(golfioUser);
         var tokenLink = Url.Action("ConfirmEmail", "Account", new { userId = golfioUser.Id, token = token }, Request.Scheme);
 
@@ -135,7 +135,7 @@ namespace ChannelAdvisor.Controllers
         return RedirectToAction("Login");
       }
 
-      GolfioUser golfioUser = await _golfioUser.GetUserInfoAsync(userId);
+      GolfioUser golfioUser = await _golfioUser.GetUserAsync(userId);
 
       if (golfioUser == null)
       {

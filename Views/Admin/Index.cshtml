@@ -32,9 +32,9 @@
           <a asp-action="Edit" asp-route-userId="@Model[i].Id">
             <i class="far fa-edit fa-lg mr-2"></i>
           </a>
-          <a asp-action="Delete" asp-route-userId="@Model[i].Id">
-            <i class="far fa-trash-alt fa-lg mr-2"></i>
-          </a>
+          <form asp-controller="Admin" asp-action="Delete" asp-route-userId="@Model[i].Id" method="POST" style="Display: inline-block;">
+            <button type="submit" style="border: 0; background: transparent; color: #fff;"><i class="far fa-trash-alt fa-lg mr-2"></i></button>
+          </form>
         </div>
       </div>
     }

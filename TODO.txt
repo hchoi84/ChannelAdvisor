@@ -1,12 +1,11 @@
 AdminController
 - Index: Displays all users and their claims
-  - Only ADMIN is allowed
   - Selecting Admin claim will remove all others
   - Selecting non-Admin claim will remove the user from being an Admin
-  - Batch update capability
-  - Sort by user name
-- Edit user info
-- Change password
+  - (Later Phase) Batch update capability
+- Edit User
+  - Ability to Change password ONLY if it's logged in user
+- Delete User
 
 ChannelAdvisor
 - Separate Secrets and Methods in DevInfo.cs

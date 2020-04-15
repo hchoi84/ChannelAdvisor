@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ChannelAdvisor.Utilities;
 using ChannelAdvisor.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 
 namespace ChannelAdvisor.Models
 {
@@ -57,12 +59,12 @@ namespace ChannelAdvisor.Models
       return identityResult;
     }
 
-    public async Task<GolfioUser> GetUserInfoAsync(string email)
+    public async Task<GolfioUser> GetUserAsync(string value)
     {
-      if (email.Contains("@"))
-        return await _db.GolfioUsers.FirstOrDefaultAsync(golfioUser => golfioUser.Email == email);
+      if (value.Contains("@"))
+        return await _userManager.FindByEmailAsync(value);
       else
-        return await _db.GolfioUsers.FirstOrDefaultAsync(golfioUser => golfioUser.Id == email);
+        return await _userManager.FindByIdAsync(value);
     }
 
     public async Task<string> CreateEmailConfirmationToken(GolfioUser golfioUser)
@@ -115,6 +117,98 @@ namespace ChannelAdvisor.Models
     public async Task<List<Claim>> GetUserClaimsAsync(GolfioUser golfioUser)
     {
       return (await _userManager.GetClaimsAsync(golfioUser)).ToList();
+    }
+
+    public async Task<IdentityResult> UpdateUserInfo(AdminEditViewModel adminEditVM)
+    {
+      GolfioUser golfioUser = await _userManager.FindByIdAsync(adminEditVM.UserId);
+
+      golfioUser.FirstName = adminEditVM.FirstName;
+      golfioUser.LastName = adminEditVM.LastName;
+      golfioUser.Email = adminEditVM.Email;
+      golfioUser.UserName = adminEditVM.Email;
+      golfioUser.NormalizedUserName = adminEditVM.Email;
+      golfioUser.NormalizedEmail = adminEditVM.Email;
+
+      return await _userManager.UpdateAsync(golfioUser);
+    }
+
+    public async Task<IdentityResult> UpdateAccessPermission(AdminEditViewModel adminEditVM)
+    {
+      // Retrieve user Claims
+      IdentityResult identityResult = new IdentityResult();
+      GolfioUser golfioUser = await _userManager.FindByIdAsync(adminEditVM.UserId);
+      List<Claim> userClaims = await GetUserClaimsAsync(golfioUser);
+
+      // Separate ClaimType True and False
+      foreach (var claimInfo in adminEditVM.ClaimInfos)
+      {
+        if (claimInfo.IsSelected == true)
+        {
+          bool isClaimInDB = userClaims.Any(uc => uc.Type.ToString() == claimInfo.ClaimType);
+
+          // If found, continue
+          if (isClaimInDB)
+          {
+            continue;
+          }
+          // If not found, create
+          else
+          {
+            Claim claim = new Claim(claimInfo.ClaimType, "true");
+            identityResult = await _userManager.AddClaimAsync(golfioUser, claim);
+          }
+        }
+        else
+        {
+          Claim claimInDB = userClaims.FirstOrDefault(uc => uc.Type.ToString() == claimInfo.ClaimType);
+
+          // If found, delete
+          if (claimInDB != null)
+          {
+            identityResult = await _userManager.RemoveClaimAsync(golfioUser, claimInDB);
+
+            if (!identityResult.Succeeded)
+            {
+              return identityResult;
+            }
+          }
+          // if not found, continue
+          else
+          {
+            continue;
+          }
+        }
+
+        if (!identityResult.Succeeded)
+        {
+          return identityResult;
+        }
+      }
+
+      return identityResult;
+    }
+
+    public async Task<IdentityResult> ChangePasswordAsync(AdminEditViewModel adminEditVM)
+    {
+      GolfioUser golfioUser = await _userManager.FindByIdAsync(adminEditVM.UserId);
+      return await _userManager.ChangePasswordAsync(golfioUser, adminEditVM.OldPassword, adminEditVM.NewPassword);
+    }
+
+    public async Task<IdentityResult> DeleteAsync(string userId)
+    {
+      try
+      {
+        GolfioUser golfioUser = await _userManager.FindByIdAsync(userId);
+        return await _userManager.DeleteAsync(golfioUser);
+      }
+      catch (DbUpdateException e)
+      {
+        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~");
+        Console.WriteLine(e.);
+        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~");
+        return IdentityResult.Failed();
+      }
     }
   }
 }
