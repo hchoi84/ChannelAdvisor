@@ -25,19 +25,6 @@ namespace ChannelAdvisor.ViewModels
 
     public List<ClaimInfo> ClaimInfos { get; set; }
 
-    [Display(Name = "Old Password")]
-    [DataType(DataType.Password)]
-    public string OldPassword { get; set; }
-
-    [Display(Name = "New Password")]
-    [DataType(DataType.Password)]
-    public string NewPassword { get; set; }
-
-    [Display(Name = "Confirm New Password")]
-    [Compare("NewPassword", ErrorMessage = "Doesn't match with New Password")]
-    [DataType(DataType.Password)]
-    public string NewConfirmPassword { get; set; }
-
     public AdminEditViewModel()
     {
       ClaimInfos = new List<ClaimInfo>();

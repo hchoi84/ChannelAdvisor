@@ -37,7 +37,7 @@ namespace ChannelAdvisor.Controllers
         AdminIndexViewModel adminIndexViewModel = new AdminIndexViewModel
         {
           Id = golfioUser.Id,
-          FullName = golfioUser.GetFullName,
+          FullName = golfioUser.FullName,
           Claims = await _golfioUser.GetUserClaimsAsync(golfioUser),
         };
 
@@ -128,23 +128,6 @@ namespace ChannelAdvisor.Controllers
         TempData["AccessPermission"] = "Updating user Access Permission Successful";
         return RedirectToAction("Edit", new { userId = adminEditVM.UserId });
       }
-    }
-
-    [HttpPost("Admin/Edit/UpdatePassword")]
-    public async Task<IActionResult> ChangePassword(AdminEditViewModel adminEditVM)
-    {
-      IdentityResult identityResult = await _golfioUser.ChangePasswordAsync(adminEditVM);
-      
-      if (identityResult.Succeeded)
-      {
-        TempData["ChangePassword"] = "Password has been updated";
-      }
-      else
-      {
-        TempData["ChangePassword"] = "Password update failed";
-      }
-
-      return View();
     }
 
     [HttpPost("Admin/Delete/{userId}")]

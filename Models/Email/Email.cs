@@ -15,13 +15,13 @@ namespace ChannelAdvisor.Models
       EmailSecret emailSecret = new EmailSecret();
       EmailSubject = "Please confirm your email";
       MailboxAddress from = new MailboxAddress("Golfio Admin", emailSecret.emailAddress);
-      MailboxAddress to = new MailboxAddress(golfioUser.GetFullName, golfioUser.Email);
+      MailboxAddress to = new MailboxAddress(golfioUser.FullName, golfioUser.Email);
 
       BodyBuilder bodyBuilder = new BodyBuilder();
       if (emailType == EmailType.EmailConfirmation)
       {
         bodyBuilder.HtmlBody =
-          $"<h1>Hello {golfioUser.GetFullName} </h1> \n\n" +
+          $"<h1>Hello {golfioUser.FullName} </h1> \n\n" +
           "<p>You've recently registered for Project Tracker</p> \n\n" +
           "<p>Please click below to confirm your email address</p> \n\n" +
           $"<a href='{tokenLink}'><button style='color:#fff; background-color:#007bff; border-color:#007bff;'>Confirm</button></a> \n\n" +
@@ -32,7 +32,7 @@ namespace ChannelAdvisor.Models
       else
       {
         bodyBuilder.HtmlBody =
-          $"<h1>Hello {golfioUser.GetFullName} </h1> \n\n" +
+          $"<h1>Hello {golfioUser.FullName} </h1> \n\n" +
           "<p>You've recently requested for password reset</p> \n\n" +
           "<p>Please click below to reset your password</p> \n\n" +
           $"<a href='{tokenLink}'><button style='color:#fff; background-color:#007bff; border-color:#007bff;'>Confirm</button></a> \n\n" +

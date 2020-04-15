@@ -141,14 +141,20 @@ namespace ChannelAdvisor.Models
       List<Claim> userClaims = await GetUserClaimsAsync(golfioUser);
 
       // Does adminEditVM.ClaimInfos.ClaimType contain Admin?
-      ClaimInfo adminClaimInfo = adminEditVM.ClaimInfos.FirstOrDefault(ci => ci.ClaimType == ClaimType.Admin.ToString());
+      ClaimInfo adminClaimInfo = adminEditVM.ClaimInfos.FirstOrDefault(ci => ci.ClaimType == ClaimType.Admin.ToString() && ci.IsSelected == true);
         // If yes, check DB to see if there's Admin
         if (adminClaimInfo != null)
         {
           bool isClaimInDB = userClaims.Any(uc => uc.Type.ToString() == adminClaimInfo.ClaimType);
 
           // If no, add and remove all other claims
-          if (!isClaimInDB)
+          if (isClaimInDB)
+          {
+            List<Claim> nonAdminClaims = userClaims.Where(uc => uc.Type != ClaimType.Admin.ToString()).ToList();
+            await _userManager.RemoveClaimsAsync(golfioUser, nonAdminClaims);
+            return IdentityResult.Success;
+          }
+          else
           {
             await _userManager.RemoveClaimsAsync(golfioUser, userClaims);
             Claim claim = new Claim(adminClaimInfo.ClaimType, "true");
@@ -157,7 +163,7 @@ namespace ChannelAdvisor.Models
         }
 
       // Separate ClaimValue True and False
-      foreach (var claimInfo in adminEditVM.ClaimInfos.Where(ci => ci.ClaimType != ClaimType.Admin.ToString()))
+      foreach (var claimInfo in adminEditVM.ClaimInfos)
       {
         if (claimInfo.IsSelected == true)
         {
@@ -205,10 +211,10 @@ namespace ChannelAdvisor.Models
       return identityResult;
     }
 
-    public async Task<IdentityResult> ChangePasswordAsync(AdminEditViewModel adminEditVM)
+    public async Task<IdentityResult> ChangePasswordAsync(UserEditViewModel userEditVM)
     {
-      GolfioUser golfioUser = await _userManager.FindByIdAsync(adminEditVM.UserId);
-      return await _userManager.ChangePasswordAsync(golfioUser, adminEditVM.OldPassword, adminEditVM.NewPassword);
+      GolfioUser golfioUser = await _userManager.FindByIdAsync(userEditVM.GolfioUser.Id);
+      return await _userManager.ChangePasswordAsync(golfioUser, userEditVM.OldPassword, userEditVM.NewPassword);
     }
 
     public async Task<IdentityResult> DeleteAsync(string userId)

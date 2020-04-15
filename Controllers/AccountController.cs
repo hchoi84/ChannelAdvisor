@@ -70,7 +70,7 @@ namespace ChannelAdvisor.Controllers
         return View(loginVM);
       }
 
-      HttpContext.Session.SetString("FullName", golfioUser.GetFullName);
+      HttpContext.Session.SetString("FullName", golfioUser.FullName);
 
       if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
       {

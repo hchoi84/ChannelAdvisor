@@ -22,7 +22,7 @@ namespace ChannelAdvisor.Models
     Task<List<Claim>> GetUserClaimsAsync(GolfioUser golfioUser);
     Task<IdentityResult> UpdateUserInfo(AdminEditViewModel adminEditVM);
     Task<IdentityResult> UpdateAccessPermission(AdminEditViewModel adminEditVM);
-    Task<IdentityResult> ChangePasswordAsync(AdminEditViewModel adminEditVM);
+    Task<IdentityResult> ChangePasswordAsync(UserEditViewModel userEditVM);
     Task<IdentityResult> DeleteAsync(string userId);
   }
 }
