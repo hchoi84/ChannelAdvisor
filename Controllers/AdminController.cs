@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using ChannelAdvisor.Models;
 using ChannelAdvisor.Utilities;
 using ChannelAdvisor.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChannelAdvisor.Controllers
 {
+  [Authorize(Policy = "Admin")]
   public class AdminController : Controller
   {
     private readonly IGolfioUser _golfioUser;
@@ -156,7 +158,9 @@ namespace ChannelAdvisor.Controllers
       }
       else
       {
-        return Json(identityResult.Errors);
+        TempData["MessageTitle"] = "Action Failed";
+        TempData["Message"] = "Deleting the user failed due to dependencies";
+        return RedirectToAction("Index");
       }
     }
   }

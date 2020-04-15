@@ -140,8 +140,24 @@ namespace ChannelAdvisor.Models
       GolfioUser golfioUser = await _userManager.FindByIdAsync(adminEditVM.UserId);
       List<Claim> userClaims = await GetUserClaimsAsync(golfioUser);
 
-      // Separate ClaimType True and False
-      foreach (var claimInfo in adminEditVM.ClaimInfos)
+      // Does adminEditVM.ClaimInfos.ClaimType contain Admin?
+      ClaimInfo adminClaimInfo = adminEditVM.ClaimInfos.FirstOrDefault(ci => ci.ClaimType == ClaimType.Admin.ToString());
+        // If yes, check DB to see if there's Admin
+        if (adminClaimInfo != null)
+        {
+          bool isClaimInDB = userClaims.Any(uc => uc.Type.ToString() == adminClaimInfo.ClaimType);
+
+          // If no, add and remove all other claims
+          if (!isClaimInDB)
+          {
+            await _userManager.RemoveClaimsAsync(golfioUser, userClaims);
+            Claim claim = new Claim(adminClaimInfo.ClaimType, "true");
+            return await _userManager.AddClaimAsync(golfioUser, claim);
+          }
+        }
+
+      // Separate ClaimValue True and False
+      foreach (var claimInfo in adminEditVM.ClaimInfos.Where(ci => ci.ClaimType != ClaimType.Admin.ToString()))
       {
         if (claimInfo.IsSelected == true)
         {
@@ -205,7 +221,7 @@ namespace ChannelAdvisor.Models
       catch (DbUpdateException e)
       {
         Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~");
-        Console.WriteLine(e.);
+        Console.WriteLine(e.InnerException);
         Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~");
         return IdentityResult.Failed();
       }

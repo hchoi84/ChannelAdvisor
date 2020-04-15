@@ -5,7 +5,12 @@ AdminController
   - (Later Phase) Batch update capability
 - Edit User
   - Ability to Change password ONLY if it's logged in user
-- Delete User
 
 ChannelAdvisor
 - Separate Secrets and Methods in DevInfo.cs
+
+
+
+* If Access Permission contains Admin and DB doesn't have Admin, it will add Admin and remove everything else. Otherwise, it will continue with rest of the operation
+* Toast message for when deleting user fails due to dependencies (i.e. user to delete has claims associated with it)
+
