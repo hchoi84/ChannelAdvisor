@@ -6,5 +6,5 @@ Migrations
 appsettings.json
 appsettings.Development.json
 
-DevInfo.cs
+ChannelAdvisorSecret.cs
 EmailSecret.cs
